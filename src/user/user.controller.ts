@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { RegisterUserDto } from './dto/RegisterUserDto.dto';
 import { RedisService } from '../redis/redis.service';
 import { EmailService } from '../email/email.service';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -14,9 +15,29 @@ export class UserController {
   @Inject(RedisService)
   private redisService: RedisService;
 
+  @Post('login')
+  async userLogin(@Body() loginUser: LoginUserDto) {
+    const vo = await this.userService.login(loginUser, false);
+
+    return vo;
+  }
+
+  @Post('admin/login')
+  async adminLogin(@Body() loginUser: LoginUserDto) {
+    const vo = await this.userService.login(loginUser, true);
+
+    return vo;
+  }
+
   @Post('register')
   async register(@Body() registerUser: RegisterUserDto) {
     return await this.userService.register(registerUser);
+  }
+
+  @Get('init-data')
+  async initData() {
+    await this.userService.initData();
+    return 'done';
   }
 
   @Get('register-captcha')
